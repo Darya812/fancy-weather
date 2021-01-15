@@ -1,0 +1,181 @@
+* {
+  box-sizing: border-box;
+  font-family: "Montserrat", sans-serif;
+  font-style: normal;
+  color: white;
+  user-select: none;
+}
+
+body {
+  margin: 0;
+  height: 100vh;
+  width: 100%;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  background-image: url("https://bipbap.ru/wp-content/uploads/2017/09/0_14a7fc_411c2622_XXL.jpg");
+  background-size: cover;
+}
+
+header {
+    margin: none;
+}
+.wrapper {
+  margin: 40px;
+  display: flex;
+  width: 100%;
+  height: 100%;
+  justify-content: center;
+  align-items: center;
+}
+
+.control {
+  display: flex;
+  width: 50%;
+}
+
+.search {
+  display: flex;
+  width: 50%;
+  justify-content: end;
+}
+
+.control-refresh-image {
+  width: 40%;
+}
+
+.control-button,
+.search-button {
+  cursor: pointer;
+  width: 50px;
+  height: 50px;
+  margin: 0 10px;
+  border-radius: 10px;
+  border: none;
+  outline: none;
+  color: #ffffff;
+  background-color: #ffffff54;
+}
+
+.control-button:hover,
+.search-button:hover {
+  background-color: #a7a5a5;
+  transition: 0.2s;
+}
+
+.temperature-button-farenheit {
+  border-radius: 10px 0 0 10px;
+}
+
+.temperature-button-celsius {
+  border-radius: 0 10px 10px 0;
+  margin-left: -10px;
+}
+.language-button-en {
+  border-radius: 10px 0 0 10px;
+}
+
+.language-button-ru {
+  border-radius: 0 10px 10px 0;
+  margin-left: -10px;
+}
+
+.search-input {
+  height: 50px;
+  color: #ffffff;
+  background-color: #4b4b4b75;
+  border: none;
+  outline: none;
+  border-radius: 10px;
+}
+
+.search-input::placeholder {
+  color: #ffffff;
+}
+
+.search-button {
+  width: 100px;
+}
+
+.weather {
+  width: 50%;
+  color: #ffffff;
+}
+
+.weather-city {
+  font-size: 5vw;
+  font-weight: bold;
+  margin: 20px 0 0 0;
+}
+
+.weather-date-and-time {
+  font-size: 2vw;
+  margin: 0;
+}
+
+.weather-now {
+  display: flex;
+  justify-content: space-between;
+}
+
+.weather-temperature {
+  display: flex;
+  align-items: center;
+  font-size: 10vw;
+  font-weight: bold;
+  margin: 0;
+}
+
+.weather-image {
+  width: 10vw;
+}
+
+.weather-forecast {
+  display: flex;
+  justify-content: space-around;
+}
+
+.weather-day-forecast {
+  width: 33.3%;
+}
+
+.weather-day {
+  margin: 0;
+}
+
+.weather-forecast-temperature {
+  font-size: 5vw;
+}
+
+.weather-forecast-image {
+  width: 4vw;
+}
+
+.location {
+  color: #ffffff;
+}
+
+#map {
+  width: 300px;
+  height: 300px;
+border: none;
+outline: none;
+  border-radius: 10px;
+}
+
+.location-coordinates {
+  margin: 0;
+}
+
+.latitude {
+  margin-top: 5px;
+}
+
+.weather-description {
+  width: 160px;
+}
+
+.weather-text-description {
+  text-transform: uppercase;
+}

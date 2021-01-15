@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <link rel="stylesheet" href="style.css" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <script src="https://api.mapbox.com/mapbox-gl-js/v2.0.0/mapbox-gl.js"></script>
+    <link
+      href="https://api.mapbox.com/mapbox-gl-js/v2.0.0/mapbox-gl.css"
+      rel="stylesheet"
+    />
+  </head>
+  <body id="body">
+    <header>
+      <div class="wrapper">
+        <div class="control">
+          <button class="control-button refresh-background">
+            <img src="Vector.png" />
+          </button>
+          <button class="control-button language-button-en">EN</button>
+          <button class="control-button language-button-ru">RU</button>
+          <button class="control-button temperature-button-farenheit">
+            &deg;F
+          </button>
+          <button class="control-button temperature-button-celsius">
+            &deg;C
+          </button>
+        </div>
+        <div class="search">
+          <input
+            type="text"
+            class="search-input"
+            placeholder="Search city or ZIP"
+          />
+          <button class="search-button">SEARCH</button>
+        </div>
+      </div>
+    </header>
+    <main>
+      <div class="wrapper">
+        <div class="weather">
+          <div class="weather-location-and-date">
+            <p class="weather-city">Grodno, Belarus</p>
+            <p class="weather-date-and-time"></p>
+          </div>
+          <div class="weather-now">
+            <div class="weather-temperature">-2&deg;</div>
+            <div class="weather-description">
+              <img src="" alt="" class="weather-image" />
+              <div class="weather-text-description">
+                <p class="overcast"></p>
+                <p class="feelsLike">Feels like:</p>
+                <p class="speedWind">Wind:</p>
+                <p class="humidity">Humidity:</p>
+              </div>
+            </div>
+          </div>
+          <div class="weather-forecast">
+            <div class="weather-day-forecast">
+              <p class="first-day">first</p>
+              <span class="first-forecast-temperature">1&deg;C</span>
+              <span class="weather-forecast-image"></span>
+            </div>
+            <div class="weather-day-forecast">
+              <p class="second-day">second</p>
+              <span class="second-forecast-temperature">2&deg;C</span>
+              <span class="weather-forecast-image"></span>
+            </div>
+            <div class="weather-day-forecast">
+              <p class="third-day">third</p>
+              <span class="third-forecast-temperature">3&deg;C</span>
+              <span class="weather-forecast-image"></span>
+            </div>
+          </div>
+        </div>
+        <div class="location">
+          <div class="location-map" id="map"></div>
+          <p class="location-coordinates latitude"></p>
+          <p class="location-coordinates longitude"></p>
+        </div>
+      </div>
+    </main>
+    <script src="action.js"></script>
+  </body>
+</html>
