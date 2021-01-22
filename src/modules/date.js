@@ -1,7 +1,12 @@
 const dateTimeWeather = document.querySelector(".weather-date-and-time");
 
 export function showTime() {
-    let today = new Date();
+  // let now = new Date();
+  
+  //   let currentTimeZoneOffset = now.getTimezoneOffset() / 60;
+  //   let localTime = now.getTime() + currentTimeZoneOffset + 
+  //   let today = new Date(localTime);
+  let today = new Date();
     let hour = today.getHours();
     let min = today.getMinutes();
     let sec = today.getSeconds();
