@@ -180,6 +180,7 @@ function getCoords(positionLatit, positionLongit) {
 }
 
 //-------weather now-------
+
 function getWeatherNow(placeName) {
   return fetch(
     `https://api.openweathermap.org/data/2.5/weather?q=${placeName}&appid=8f688ccc6f525b68944b9eab6d340d1b&lang=${requestLang}&pretty=1`
