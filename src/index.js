@@ -1,7 +1,7 @@
 import "./style.css";
 import { getBackground } from "./modules/refresh-bg";
-import {langEn} from "./modules/languageEn";
-import {langRu} from "./modules/languageRu";
+import { langEn } from "./modules/languageEn";
+import { langRu } from "./modules/languageRu";
 
 const refreshBg = document.querySelector(".refresh-background");
 const buttonEn = document.querySelector(".language-button-en");
@@ -25,39 +25,31 @@ const secondIcon = document.querySelector(".second-icon");
 const thirdIcon = document.querySelector(".third-icon");
 const latitude = document.querySelector(".latitude");
 const longitude = document.querySelector(".longitude");
-
 const dateTimeWeather = document.querySelector(".weather-date-and-time");
 const firstDay = document.querySelector(".first-day");
 const secondDay = document.querySelector(".second-day");
 const thirdDay = document.querySelector(".third-day");
-
-
 let positionLatit;
 let positionLongit;
-
 let address;
-  let placeName;
+let placeName;
 let country;
 let checkTemp = false;
 let checkRu = false;
-let translator; 
+let translator;
 let requestLang;
-
-
-
+let timezone;
 
 //-----start app----
-function start (){
+function start() {
   checkRu = localStorage.getItem("checkRu");
   checkTemp = localStorage.getItem("checkTemp");
-   createMap();
+  createMap();
   showTime();
-  }
+}
 
 //-----search------
-
 function getAddress(positionLatit, positionLongit) {
-
   return fetch(
     `https://api.opencagedata.com/geocode/v1/json?q=${positionLatit}+${positionLongit}&key=f650e4b67c054cfd9c0224e9b3ddf880&language=${requestLang}&pretty=1`
   ).then((response) => response.json());
@@ -67,7 +59,7 @@ async function showAddress(positionLatit, positionLongit) {
   try {
     requestLang = checkRu ? "ru" : "en";
     address = await getAddress(positionLatit, positionLongit);
-    
+    timezone = address.results[0].annotations.timezone.offset_sec;
     placeName = address.results[0].components.city;
     country = address.results[0].components.country;
     cityAndCountry.textContent = `${placeName}, ${country}`;
@@ -79,7 +71,6 @@ async function showAddress(positionLatit, positionLongit) {
 }
 
 function searchCity(placeName) {
-  
   return fetch(
     `https://api.opencagedata.com/geocode/v1/json?q=${placeName}&key=f650e4b67c054cfd9c0224e9b3ddf880&language=${requestLang}&pretty=1`
   ).then((response) => response.json());
@@ -88,9 +79,10 @@ function searchCity(placeName) {
 async function showCity() {
   try {
     requestLang = checkRu ? "ru" : "en";
-      
-      address = await searchCity(placeName);
+    address = await searchCity(placeName);
     console.log(address);
+    timezone = address.results[0].annotations.timezone.offset_sec;
+    console.log(timezone);
     if (address) {
       const result = address.results[0].components;
       placeName = result.city
@@ -98,18 +90,18 @@ async function showCity() {
         : result.town
         ? result.town
         : result.village;
-
       const { country } = result;
       cityAndCountry.textContent = `${placeName}, ${country}`;
       const pos = address.results[0].geometry;
       positionLatit = pos.lat.toFixed(2);
       positionLongit = pos.lng.toFixed(2);
-      localStorage.setItem('placeName', placeName);
+      localStorage.setItem("placeName", placeName);
       searchInput.value = "";
       showWeatherNow(placeName);
       showForecastWeather(placeName);
       getMap(positionLatit, positionLongit);
       getCoords(positionLatit, positionLongit);
+      showTime();
     }
   } catch (error) {
     alert(error);
@@ -117,49 +109,39 @@ async function showCity() {
 }
 
 //-----date-time----------------------------------
-function showTime() {
+async function showTime() {
   translator = checkRu ? langRu : langEn;
-
-    //  let now = new Date();
-    // let currentTimeZoneOffsetInHours = now.getTimezoneOffset() * 60000;
-    // let localTime = now.getTime() +
-    // currentTimeZoneOffsetInHours +
-    // timezone * 1000;
-    // let today = new Date(localTime);
-
-
-  let today = new Date();
+  let now = new Date();
+  let currentTimeZoneOffsetInHours = now.getTimezoneOffset() * 60000;
+  let localTime =
+    now.getTime() + currentTimeZoneOffsetInHours + timezone * 1000;
+  let today = new Date(localTime);
   let hour = today.getHours();
   let min = today.getMinutes();
   let sec = today.getSeconds();
   let d = today.getDay();
   let m = today.getMonth();
   let date = today.getDate();
-   dateTimeWeather.textContent = `${translator.shortDay[d]} ${date} ${
+  dateTimeWeather.textContent = `${translator.shortDay[d]} ${date} ${
     translator.month[m]
   }   ${hour}:${addZero(min)}:${addZero(sec)}`;
-   
-  firstDay.textContent =  `${translator.fullDay[getFullDay(d+1)]}`;
-  secondDay.textContent = `${translator.fullDay[getFullDay(d+2)]}`;
-  thirdDay.textContent = `${translator.fullDay[getFullDay(d+3)]}`;
+  firstDay.textContent = `${translator.fullDay[getFullDay(d + 1)]}`;
+  secondDay.textContent = `${translator.fullDay[getFullDay(d + 2)]}`;
+  thirdDay.textContent = `${translator.fullDay[getFullDay(d + 3)]}`;
   setTimeout(showTime, 1000);
-
   searchButton.textContent = `${translator.search.button}`;
   searchInput.placeholder = `${translator.search.input}`;
-
 }
 
 function addZero(n) {
   return (parseInt(n, 10) < 10 ? "0" : "") + n;
 }
 
-function getFullDay (n){
-return n% 7;
+function getFullDay(n) {
+  return n % 7;
 }
 
-
 //----------------map---------------
-
 function createMap() {
   navigator.geolocation.getCurrentPosition(showMap);
   function showMap(position) {
@@ -180,7 +162,6 @@ function getMap(positionLatit, positionLongit) {
     center: [positionLongit, positionLatit],
     zoom: 13,
   });
-
   const marker = new mapboxgl.Marker()
     .setLngLat([positionLongit, positionLatit])
     .addTo(map);
@@ -198,15 +179,12 @@ function getCoords(positionLatit, positionLongit) {
   longitude.textContent = `${translator.coordinates.longit} ${lonDegree}°  ${lonMinute}'`;
 }
 
-
 //-------weather now-------
-
 function getWeatherNow(placeName) {
   return fetch(
     `https://api.openweathermap.org/data/2.5/weather?q=${placeName}&appid=8f688ccc6f525b68944b9eab6d340d1b&lang=${requestLang}&pretty=1`
   ).then((response) => response.json());
 }
-
 
 async function showWeatherNow(placeName) {
   try {
@@ -218,15 +196,14 @@ async function showWeatherNow(placeName) {
     const tempNow = weather.main.temp;
     const iconNow = weather.weather[0].icon;
     const windNow = weather.wind.speed;
-
     temperatureNow.textContent = checkTemp
       ? `${Math.round((tempNow - 273.15) * 1.8 + 32)}°`
       : `${Math.round(tempNow - 273.15)}°`;
-
     feels_like.textContent = checkTemp
-      ? `${translator.summary.feels} ${`${Math.round((feelsLike - 273.15) * 1.8 + 32)}°`}`
+      ? `${translator.summary.feels} ${`${Math.round(
+          (feelsLike - 273.15) * 1.8 + 32
+        )}°`}`
       : `${translator.summary.feels} ${`${Math.round(feelsLike - 273.15)}°`}`;
-
     humidity.textContent = `${translator.summary.humidity} ${humidityNow}%`;
     wind.textContent = `${translator.summary.wind} ${windNow} ${translator.summary.speed}`;
     overcast.textContent = weather.weather[0].description;
@@ -249,7 +226,6 @@ async function showForecastWeather(placeName) {
     const firstTemperature = forecastWeather.list[9].main.temp;
     const secTemperature = forecastWeather.list[17].main.temp;
     const thirdTemperature = forecastWeather.list[25].main.temp;
-
     firstTemp.textContent = checkTemp
       ? `${Math.round((firstTemperature - 273.15) * 1.8 + 32)}°`
       : `${Math.round(firstTemperature - 273.15)}°`;
@@ -259,7 +235,6 @@ async function showForecastWeather(placeName) {
     thirdTemp.textContent = checkTemp
       ? `${Math.round((thirdTemperature - 273.15) * 1.8 + 32)}°`
       : `${Math.round(thirdTemperature - 273.15)}°`;
-
     firstIcon.style.backgroundImage = `url(http://openweathermap.org/img/wn/${forecastWeather.list[9].weather[0].icon}@2x.png)`;
     secondIcon.style.backgroundImage = `url(http://openweathermap.org/img/wn/${forecastWeather.list[17].weather[0].icon}@2x.png)`;
     thirdIcon.style.backgroundImage = `url(http://openweathermap.org/img/wn/${forecastWeather.list[25].weather[0].icon}@2x.png)`;
@@ -269,27 +244,25 @@ async function showForecastWeather(placeName) {
 }
 
 //change --------c f------
-
 function activeFarenheit() {
   checkTemp = true;
+  localStorage.setItem("checkTemp", checkTemp);
   buttonC.classList.remove("active");
   buttonF.classList.add("active");
   showWeatherNow(placeName);
   showForecastWeather(placeName);
-  localStorage.setItem("checkTemp", checkTemp);
-  }
+}
 
 function activeCelsius() {
   checkTemp = false;
+  localStorage.setItem("checkTemp", checkTemp);
   buttonC.classList.add("active");
   buttonF.classList.remove("active");
   showWeatherNow(placeName);
   showForecastWeather(placeName);
-  localStorage.setItem("checkTemp", checkTemp);
 }
 
 // change language-------------
-
 function activeRu() {
   checkRu = true;
   localStorage.setItem("checkRu", checkRu);
@@ -301,10 +274,10 @@ function activeRu() {
   showWeatherNow(placeName);
   showForecastWeather(placeName);
   showTime();
-  }
+}
 
 function activeEn() {
-  checkRu= false;
+  checkRu = false;
   localStorage.setItem("checkRu", checkRu);
   buttonEn.classList.add("active");
   buttonRu.classList.remove("active");
@@ -314,7 +287,6 @@ function activeEn() {
   showWeatherNow(placeName);
   showForecastWeather(placeName);
   showTime();
- 
 }
 
 function pressEnter(e) {
@@ -324,11 +296,8 @@ function pressEnter(e) {
   }
 }
 
-
-
 buttonRu.addEventListener("click", activeRu);
 buttonEn.addEventListener("click", activeEn);
-
 searchButton.addEventListener("click", () => {
   placeName = searchInput.value;
   showCity();
@@ -338,6 +307,4 @@ buttonF.addEventListener("click", activeFarenheit);
 buttonC.addEventListener("click", activeCelsius);
 refreshBg.addEventListener("click", getBackground);
 window.addEventListener("load", getBackground);
-
-
 window.addEventListener("load", start);
