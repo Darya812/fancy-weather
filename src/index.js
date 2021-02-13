@@ -2,6 +2,7 @@ import "./style.css";
 import { getBackground } from "./modules/refresh-bg";
 import { langEn } from "./modules/languageEn";
 import { langRu } from "./modules/languageRu";
+import {showTime} from "./modules/time";
 
 const refreshBg = document.querySelector(".refresh-background");
 const buttonEn = document.querySelector(".language-button-en");
@@ -25,10 +26,6 @@ const secondIcon = document.querySelector(".second-icon");
 const thirdIcon = document.querySelector(".third-icon");
 const latitude = document.querySelector(".latitude");
 const longitude = document.querySelector(".longitude");
-const dateTimeWeather = document.querySelector(".weather-date-and-time");
-const firstDay = document.querySelector(".first-day");
-const secondDay = document.querySelector(".second-day");
-const thirdDay = document.querySelector(".third-day");
 let positionLatit;
 let positionLongit;
 let address;
@@ -42,11 +39,17 @@ let timezone;
 
 //-----start app----
 function start() {
-  checkRu = localStorage.getItem("checkRu");
+  navigator.geolocation.getCurrentPosition( (position)=> {
+       checkRu = localStorage.getItem("checkRu");
   checkTemp = localStorage.getItem("checkTemp");
-  createMap();
-  showTime();
-}
+  showMap(position);
+
+ checkRu === "true" ? activeRu() : activeEn();
+ checkTemp === "true" ? activeFarenheit() : activeCelsius();
+ 
+})
+
+ }
 
 //-----search------
 function getAddress(positionLatit, positionLongit) {
@@ -65,6 +68,7 @@ async function showAddress(positionLatit, positionLongit) {
     cityAndCountry.textContent = `${placeName}, ${country}`;
     showWeatherNow(placeName);
     showForecastWeather(placeName);
+    showTime(checkRu, timezone);
   } catch (error) {
     alert(error);
   }
@@ -77,6 +81,7 @@ function searchCity(placeName) {
 }
 
 async function showCity() {
+  if (!placeName) return;
   try {
     requestLang = checkRu ? "ru" : "en";
     address = await searchCity(placeName);
@@ -101,49 +106,14 @@ async function showCity() {
       showForecastWeather(placeName);
       getMap(positionLatit, positionLongit);
       getCoords(positionLatit, positionLongit);
-      showTime();
+      showTime(checkRu, timezone);
     }
   } catch (error) {
     alert(error);
   }
 }
 
-//-----date-time----------------------------------
-async function showTime() {
-  translator = checkRu ? langRu : langEn;
-  let now = new Date();
-  let currentTimeZoneOffsetInHours = now.getTimezoneOffset() * 60000;
-  let localTime =
-    now.getTime() + currentTimeZoneOffsetInHours + timezone * 1000;
-  let today = new Date(localTime);
-  let hour = today.getHours();
-  let min = today.getMinutes();
-  let sec = today.getSeconds();
-  let d = today.getDay();
-  let m = today.getMonth();
-  let date = today.getDate();
-  dateTimeWeather.textContent = `${translator.shortDay[d]} ${date} ${
-    translator.month[m]
-  }   ${hour}:${addZero(min)}:${addZero(sec)}`;
-  firstDay.textContent = `${translator.fullDay[getFullDay(d + 1)]}`;
-  secondDay.textContent = `${translator.fullDay[getFullDay(d + 2)]}`;
-  thirdDay.textContent = `${translator.fullDay[getFullDay(d + 3)]}`;
-  setTimeout(showTime, 1000);
-  searchButton.textContent = `${translator.search.button}`;
-  searchInput.placeholder = `${translator.search.input}`;
-}
-
-function addZero(n) {
-  return (parseInt(n, 10) < 10 ? "0" : "") + n;
-}
-
-function getFullDay(n) {
-  return n % 7;
-}
-
 //----------------map---------------
-function createMap() {
-  navigator.geolocation.getCurrentPosition(showMap);
   function showMap(position) {
     positionLatit = position.coords.latitude.toFixed(2);
     positionLongit = position.coords.longitude.toFixed(2);
@@ -151,7 +121,6 @@ function createMap() {
     showAddress(positionLatit, positionLongit);
     getMap(positionLatit, positionLongit);
   }
-}
 
 function getMap(positionLatit, positionLongit) {
   mapboxgl.accessToken =
@@ -180,7 +149,6 @@ function getCoords(positionLatit, positionLongit) {
 }
 
 //-------weather now-------
-
 function getWeatherNow(placeName) {
   return fetch(
     `https://api.openweathermap.org/data/2.5/weather?q=${placeName}&appid=8f688ccc6f525b68944b9eab6d340d1b&lang=${requestLang}&pretty=1`
@@ -188,6 +156,7 @@ function getWeatherNow(placeName) {
 }
 
 async function showWeatherNow(placeName) {
+  if (!placeName) return;
   try {
     requestLang = checkRu ? "ru" : "en";
     const weather = await getWeatherNow(placeName);
@@ -209,6 +178,9 @@ async function showWeatherNow(placeName) {
     wind.textContent = `${translator.summary.wind} ${windNow} ${translator.summary.speed}`;
     overcast.textContent = weather.weather[0].description;
     iconWeather.style.backgroundImage = `url(http://openweathermap.org/img/wn/${iconNow}@2x.png)`;
+    
+    searchButton.textContent = `${translator.search.button}`;
+    searchInput.placeholder = `${translator.search.input}`;
   } catch (error) {
     alert(error);
   }
@@ -222,6 +194,7 @@ function getForecastWeather(placeName) {
 }
 
 async function showForecastWeather(placeName) {
+  if (!placeName) return;
   try {
     const forecastWeather = await getForecastWeather(placeName);
     const firstTemperature = forecastWeather.list[9].main.temp;
@@ -274,7 +247,7 @@ function activeRu() {
   showCity();
   showWeatherNow(placeName);
   showForecastWeather(placeName);
-  showTime();
+  showTime(checkRu, timezone);
 }
 
 function activeEn() {
@@ -287,7 +260,7 @@ function activeEn() {
   showCity();
   showWeatherNow(placeName);
   showForecastWeather(placeName);
-  showTime();
+  showTime(checkRu, timezone);
 }
 
 function pressEnter(e) {
@@ -309,3 +282,5 @@ buttonC.addEventListener("click", activeCelsius);
 refreshBg.addEventListener("click", getBackground);
 window.addEventListener("load", getBackground);
 window.addEventListener("load", start);
+
+
